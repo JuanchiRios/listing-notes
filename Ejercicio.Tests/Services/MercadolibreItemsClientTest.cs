@@ -43,5 +43,15 @@ namespace Ejercicio.Tests.Services
 				request.Parameters.All(x => x.Name != "q");
 			this.restClientMock.Verify(x => x.Execute<MeliSearchingData<Item>>(It.Is(expected)), Times.Once);
 		}
-	}
+
+        [Fact]
+        public void It_should_send_a_request_to_site_search_api_to_search_by_id()
+        {
+            var id = "42";
+            this.mercadolibreItemsClient.GetById(id);
+            Expression<Func<IRestRequest, bool>> expected = request =>
+                request.Resource == "items/42";
+            this.restClientMock.Verify(x => x.Execute<Item>(It.Is(expected)), Times.Once);
+        }
+    }
 }
