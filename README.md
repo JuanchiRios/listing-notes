@@ -13,7 +13,7 @@ Si el parámetro query no se envía, trae las primeras 50 publicaciones de la ca
 Sirve para traer una publicación en particular a partir de su id
 
 ### Objetivo
-Que el usuario de la API pueda guardar notas sobre las publicaciones utilizando [MongoDB](https://docs.mongodb.org/ecosystem/drivers/csharp/) como base da datos
+Que el usuario de la API pueda guardar notas sobre las publicaciones utilizando [MongoDB](https://docs.mongodb.org/ecosystem/drivers/csharp/) como base da datos para persistirlas.
 Crear los siguientes endpoints:
 
 1) `PUT /items/:id` enviando las notas en el body de la request dentro de un json.
