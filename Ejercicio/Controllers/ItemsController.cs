@@ -5,7 +5,8 @@ using Ejercicio.Services;
 
 namespace Ejercicio.Controllers
 {
-    public class ItemsController : ApiController
+	[RoutePrefix("items")]
+	public class ItemsController : ApiController
     {
 	    private readonly MercadolibreItemsClient itemsClient;
 	    public ItemsController(MercadolibreItemsClient itemsClient)
@@ -13,8 +14,8 @@ namespace Ejercicio.Controllers
 		    this.itemsClient = itemsClient;
 	    }
 
-	    // GET: api/Items
-        public IEnumerable<Item> Get(string query)
+		[Route("search"), HttpGet]
+		public IEnumerable<Item> GetSearch(string query)
         {
             return itemsClient.Search(query);
         }
