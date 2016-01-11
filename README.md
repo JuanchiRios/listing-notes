@@ -28,4 +28,4 @@ Ejemplo de un body:
 
 4) Mejorar el endpoint creado en el punto 3) para que si se envía el parametro query por querystring realice una búsqueda dentro de las notas y devuelva las publicaciones encontradas.
 
-En todos los puntos desarrollar los test unitarios que crea necesarios.
+En todos los puntos desarrollar los tests unitarios que crea necesarios.
