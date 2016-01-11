@@ -14,10 +14,16 @@ namespace Ejercicio.Controllers
 		    this.itemsClient = itemsClient;
 	    }
 
-		[Route("search"), HttpGet]
-		public IEnumerable<Item> GetSearch(string query)
-        {
-            return itemsClient.Search(query);
-        }
-    }
+		[Route("{id}")]
+		public Item GetById(string id)
+		{
+			return itemsClient.GetById(id);
+		}
+
+		[Route("search")]
+		public IEnumerable<Item> GetSearch(string query = null)
+		{
+			return itemsClient.Search(query);
+		}
+	}
 }

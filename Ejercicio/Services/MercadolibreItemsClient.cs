@@ -25,6 +25,14 @@ namespace Ejercicio.Services
 			var response = this.restClient.Execute<MeliSearchingData<Item>>(request);
 			return response.Data.Results;
 		}
+
+		public Item GetById(string id)
+		{
+			var request = new RestRequest("items/" + id);
+			request.Method = Method.GET;
+			var response = this.restClient.Execute<Item>(request);
+			return response.Data;
+		}
 	}
 
 	public class MeliSearchingData<T>
