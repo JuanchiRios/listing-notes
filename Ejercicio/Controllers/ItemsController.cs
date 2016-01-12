@@ -55,7 +55,8 @@ namespace Ejercicio.Controllers
             IEnumerable<Item> items = this.GetSearch();
             foreach (var item in items)
             {
-                if (item.Note != null) itemsWithNotes.Add(item);
+                if (item.Note != null && query == null) itemsWithNotes.Add(item);
+                if (item.Note != null && item.Note.ContainsValue(query)) itemsWithNotes.Add(item);
             }
             return itemsWithNotes;
         }
