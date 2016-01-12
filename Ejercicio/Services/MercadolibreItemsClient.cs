@@ -9,6 +9,8 @@ namespace Ejercicio.Services
     public class MercadolibreItemsClient
     {
         private readonly MercadolibreRestClient restClient;
+        private static MongoClient client = new MongoClient("mongodb://localhost:27017");
+        public IMongoDatabase database { get; set; } = client.GetDatabase("itemsNotes");
 
         public MercadolibreItemsClient(MercadolibreRestClient restClient)
         {
@@ -32,23 +34,22 @@ namespace Ejercicio.Services
         {
             var request = new RestRequest("items/" + id);
             request.Method = Method.GET;
+            IMongoCollection<BsonDocument> notesPerItem = database.GetCollection<BsonDocument>(id);
+
+            request.Parameters.Add(new Parameter { Name = "notes", Type = ParameterType.RequestBody, Value = notesPerItem });
             var response = this.restClient.Execute<Item>(request);
             return response.Data;
         }
-        
-        public Item PutNote(string itemID, BsonDocument aNote, IMongoDatabase database)
+
+        public async System.Threading.Tasks.Task<Item> PutNote(string itemID, BsonDocument aNote)
         {
+            IMongoCollection<BsonDocument> notesPerItem = database.GetCollection<BsonDocument>(itemID);
+            await notesPerItem.InsertOneAsync(aNote);
             var request = new RestRequest("items/" + itemID + "/notes");
             request.Method = Method.PUT;
             request.Parameters.Add(new Parameter { Name = "note", Type = ParameterType.RequestBody, Value = aNote });
             var response = this.restClient.Execute<Item>(request);
             return response.Data;
-        /*      IMongoCollection<BsonDocument> notesPerItem = database.GetCollection<BsonDocument>(itemID);
-                     await notesPerItem.InsertOneAsync(aNote);
-                      var request = new RestRequest("items/" + id);
-                      request.Method = Method.GET;
-                      var response = this.restClient.Execute<Item>(request);
-                      return response.Data;*/
         }
     }
 

@@ -25,9 +25,9 @@ namespace Ejercicio.Controllers
 		}
 
         [Route("id/notes")]
-        public Item PutNote(string itemID, BsonDocument aNote)
+        public System.Threading.Tasks.Task<Item> PutNote(string itemID, BsonDocument aNote)
         {
-            return itemsClient.PutNote(itemID, aNote, database);
+            return itemsClient.PutNote(itemID, aNote);
        //     var notesPerItem = database.GetCollection<BsonDocument>(itemID);
        //     await notesPerItem.InsertOneAsync(aNote);
         }
@@ -39,3 +39,4 @@ namespace Ejercicio.Controllers
 		}
 	}
 }
+

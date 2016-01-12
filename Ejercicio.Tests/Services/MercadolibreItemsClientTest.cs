@@ -16,7 +16,7 @@ namespace Ejercicio.Tests.Services
     {
         private MercadolibreItemsClient mercadolibreItemsClient;
         private Mock<MercadolibreRestClient> restClientMock;
-        private static MongoClient client = new MongoClient();
+        private static MongoClient client = new MongoClient("mongodb://localhost:27017");
         public IMongoDatabase database { get; } = client.GetDatabase("itemsNotesTest");
 
         public MercadolibreItemsClientTest()
@@ -25,6 +25,7 @@ namespace Ejercicio.Tests.Services
             var response = new RestResponse<MeliSearchingData<Item>> { Data = new MeliSearchingData<Item>() };
             this.restClientMock.Setup(x => x.Execute<MeliSearchingData<Item>>(It.IsAny<IRestRequest>())).Returns(response);
             this.mercadolibreItemsClient = new MercadolibreItemsClient(this.restClientMock.Object);
+            mercadolibreItemsClient.database = database;
         }
 
         [Fact]
@@ -59,18 +60,38 @@ namespace Ejercicio.Tests.Services
         }
 
         [Fact]
-        public void It_should_send_a_request_to_site_search_api_to_put_a_note_in_an_item()
+        public async void It_should_send_a_request_to_site_search_api_to_put_a_note_in_an_item()
         {
             var id = "42";
             var aNote = new BsonDocument
                             {
                                 { "description", "esta publicación me interesa" }
                             };
-            this.mercadolibreItemsClient.PutNote(id, aNote, database);
+            await this.mercadolibreItemsClient.PutNote(id, aNote);
             Expression<Func<IRestRequest, bool>> expected = request =>
                 request.Resource == "items/42/notes" &&
                 request.Parameters.Find(x => x.Name == "note").Value.Equals(aNote);
             this.restClientMock.Verify(x => x.Execute<Item>(It.Is(expected)), Times.Once);
+        }
+
+        [Fact(Skip = "Thinking why is failing")]
+        public async void It_should_get_the_same_note_that_it_was_put_in_the_item()
+        {
+            var id = "42";
+            var aNote = new BsonDocument
+                            {
+                                { "description", "esta publicación me interesa" }
+                            };
+            await this.mercadolibreItemsClient.PutNote(id, aNote);
+            IMongoCollection<BsonDocument> notesPerItem = database.GetCollection<BsonDocument>(id);
+
+            this.mercadolibreItemsClient.GetById(id);
+            Expression<Func<IRestRequest, bool>> expected = request =>
+                request.Resource == "items/42" &&
+                request.Parameters.Find(x => x.Name == "notes").Value.Equals(notesPerItem);
+  //          Assert.Equal(1, notesPerItem.Count);
+  //          Assert.Equal(aNote,notesPerItem.Find(x => true));
+            this.restClientMock.Verify(x => x.Execute<Item>(It.Is(expected)), Times.Exactly(2));
         }
     }
 }
