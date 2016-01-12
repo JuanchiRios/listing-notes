@@ -1,39 +1,58 @@
 ﻿using System.Collections.Generic;
 using Ejercicio.Models;
 using RestSharp;
+using MongoDB.Bson;
+using MongoDB.Driver;
 
 namespace Ejercicio.Services
 {
-	public class MercadolibreItemsClient
-	{
-		private readonly MercadolibreRestClient restClient;
+    public class MercadolibreItemsClient
+    {
+        private readonly MercadolibreRestClient restClient;
 
-		public MercadolibreItemsClient(MercadolibreRestClient restClient)
-		{
-			this.restClient = restClient;
-		}
+        public MercadolibreItemsClient(MercadolibreRestClient restClient)
+        {
+            this.restClient = restClient;
+        }
 
-		public IEnumerable<Item> Search(string query = null)
-		{
-			var request = new RestRequest("sites/MLA/search");
-			request.Method = Method.GET;
-			request.Parameters.Add(new Parameter { Name = "category", Type = ParameterType.QueryString, Value = "MLA1648" });
-			if (query != null)
-			{
-				request.Parameters.Add(new Parameter { Name = "q", Type = ParameterType.QueryString, Value = query });
-			}
-			var response = this.restClient.Execute<MeliSearchingData<Item>>(request);
-			return response.Data.Results;
-		}
+        public IEnumerable<Item> Search(string query = null)
+        {
+            var request = new RestRequest("sites/MLA/search");
+            request.Method = Method.GET;
+            request.Parameters.Add(new Parameter { Name = "category", Type = ParameterType.QueryString, Value = "MLA1648" });
+            if (query != null)
+            {
+                request.Parameters.Add(new Parameter { Name = "q", Type = ParameterType.QueryString, Value = query });
+            }
+            var response = this.restClient.Execute<MeliSearchingData<Item>>(request);
+            return response.Data.Results;
+        }
 
-		public Item GetById(string id)
-		{
-			var request = new RestRequest("items/" + id);
-			request.Method = Method.GET;
-			var response = this.restClient.Execute<Item>(request);
-			return response.Data;
-		}
-	}
+        public Item GetById(string id)
+        {
+            var request = new RestRequest("items/" + id);
+            request.Method = Method.GET;
+            var response = this.restClient.Execute<Item>(request);
+            return response.Data;
+        }
+        
+        public Item PutNote(string itemID, BsonDocument aNote, IMongoDatabase database)
+        {
+            var request = new RestRequest("items/" + itemID + "/notes");
+            request.Method = Method.PUT;
+            request.Parameters.Add(new Parameter { Name = "note", Type = ParameterType.RequestBody, Value = aNote });
+            var response = this.restClient.Execute<Item>(request);
+            return response.Data;
+        /*      IMongoCollection<BsonDocument> notesPerItem = database.GetCollection<BsonDocument>(itemID);
+                     await notesPerItem.InsertOneAsync(aNote);
+                      var request = new RestRequest("items/" + id);
+                      request.Method = Method.GET;
+                      var response = this.restClient.Execute<Item>(request);
+                      return response.Data;*/
+        }
+    }
+
+
 
 	public class MeliSearchingData<T>
 	{

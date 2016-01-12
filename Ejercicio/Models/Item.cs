@@ -1,4 +1,6 @@
-﻿using System;
+﻿using MongoDB.Bson;
+using MongoDB.Driver;
+using System;
 using System.Collections.Generic;
 
 namespace Ejercicio.Models
@@ -25,7 +27,7 @@ namespace Ejercicio.Models
 		public ListingStatus Status { get; set; }
 		public string[] SubStatus { get; set; }
 		public DateTime StopTime { get; set; }
-	}
+}
 
 	public enum ListingStatus { Active, Paused, Closed, UnderReview, Inactive, NotYetActive, PaymentRequired }
 	public enum ListingType { GoldSpecial, GoldPremium, Gold, Silver, Bronze, Free, GoldPro }
