@@ -34,7 +34,7 @@ namespace Ejercicio.Services
         {
             var request = new RestRequest("items/" + id);
             request.Method = Method.GET;
-            IMongoCollection<BsonDocument> notesPerItem = database.GetCollection<BsonDocument>(id);
+            var notesPerItem = database.GetCollection<BsonDocument>(id);
 
             request.Parameters.Add(new Parameter { Name = "notes", Type = ParameterType.RequestBody, Value = notesPerItem });
             var response = this.restClient.Execute<Item>(request);

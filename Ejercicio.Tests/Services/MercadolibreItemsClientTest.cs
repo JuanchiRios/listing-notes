@@ -67,11 +67,14 @@ namespace Ejercicio.Tests.Services
                             {
                                 { "description", "esta publicación me interesa" }
                             };
+
             await this.mercadolibreItemsClient.PutNote(id, aNote);
             Expression<Func<IRestRequest, bool>> expected = request =>
                 request.Resource == "items/42/notes" &&
                 request.Parameters.Find(x => x.Name == "note").Value.Equals(aNote);
             this.restClientMock.Verify(x => x.Execute<Item>(It.Is(expected)), Times.Once);
+            var aDoc= await  database.GetCollection<BsonDocument>(id).Find(new BsonDocument()).FirstOrDefaultAsync();
+            AssertionExtensions.Equals(aDoc,aNote);
         }
 
         [Fact(Skip = "Thinking why is failing")]
@@ -82,16 +85,19 @@ namespace Ejercicio.Tests.Services
                             {
                                 { "description", "esta publicación me interesa" }
                             };
+            var notesPerItem = database.GetCollection<BsonDocument>(id);
             await this.mercadolibreItemsClient.PutNote(id, aNote);
-            IMongoCollection<BsonDocument> notesPerItem = database.GetCollection<BsonDocument>(id);
+           
 
             this.mercadolibreItemsClient.GetById(id);
             Expression<Func<IRestRequest, bool>> expected = request =>
-                request.Resource == "items/42" &&
-                request.Parameters.Find(x => x.Name == "notes").Value.Equals(notesPerItem);
-  //          Assert.Equal(1, notesPerItem.Count);
-  //          Assert.Equal(aNote,notesPerItem.Find(x => true));
-            this.restClientMock.Verify(x => x.Execute<Item>(It.Is(expected)), Times.Exactly(2));
+               request.Resource == "items/42" &&
+               request.Parameters.Find(x => x.Name == "notes").Value.Equals(notesPerItem);
+            //          Assert.Equal(1, notesPerItem.Count);
+            //          Assert.Equal(aNote,notesPerItem.Find(x => true));
+            this.restClientMock.Verify(x => x.Execute<Item>(It.Is(expected)), Times.Once);
+            var aDoc = await database.GetCollection<BsonDocument>(id).Find(new BsonDocument()).FirstOrDefaultAsync();
+            AssertionExtensions.Equals(aDoc, aNote);
         }
     }
 }
