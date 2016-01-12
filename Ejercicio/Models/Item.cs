@@ -31,8 +31,7 @@ namespace Ejercicio.Models
         public async void setNote(IMongoCollection<BsonDocument> collection)
         {
             var filter = Builders<BsonDocument>.Filter.Eq("_ID", Id);
-            var document = await collection.Find(filter).FirstOrDefaultAsync();
-            if (document != null) Note = document;
+            Note = await collection.Find(filter).FirstOrDefaultAsync();//if it doesn't exist return null
         }
     }
 

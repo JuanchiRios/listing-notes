@@ -47,7 +47,19 @@ namespace Ejercicio.Controllers
             }
             return items;
         }
-        
+
+        [Route("search")]
+        public IEnumerable<Item> GetSearchWithnotes(string query = null)
+        {
+            var itemsWithNotes = new List<Item>();
+            IEnumerable<Item> items = this.GetSearch();
+            foreach (var item in items)
+            {
+                if (item.Note != null) itemsWithNotes.Add(item);
+            }
+            return itemsWithNotes;
+        }
+
     }
 }
 
