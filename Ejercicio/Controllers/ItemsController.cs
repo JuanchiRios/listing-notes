@@ -11,32 +11,43 @@ namespace Ejercicio.Controllers
 	public class ItemsController : ApiController
     {
         private static MongoClient client = new MongoClient();
-        public IMongoDatabase database { get; } = client.GetDatabase("itemsNotes");
+        private static IMongoDatabase database  = client.GetDatabase("itemsNotesDB");
+        public IMongoCollection<BsonDocument> collection { get; set; } = database.GetCollection<BsonDocument>("itemsNotesCollection");
+
         private readonly MercadolibreItemsClient itemsClient;
 	    public ItemsController(MercadolibreItemsClient itemsClient)
 	    {
 		    this.itemsClient = itemsClient;
 	    }
 
-		[Route("{id}")]
-		public Item GetById(string id)
-		{
-			return itemsClient.GetById(id);
-		}
-
-        [Route("id/notes")]
-        public System.Threading.Tasks.Task<Item> PutNote(string itemID, BsonDocument aNote)
+        [Route("{id}")]
+        public async System.Threading.Tasks.Task<Item> GetById(string id)
         {
-            return itemsClient.PutNote(itemID, aNote);
-       //     var notesPerItem = database.GetCollection<BsonDocument>(itemID);
-       //     await notesPerItem.InsertOneAsync(aNote);
+            var item = itemsClient.GetById(id);
+            item.setNote(collection);
+            return item;
+
+        }
+
+        [Route("{id}"), HttpPut]
+        public async void PutNote(string itemID, string aNote)
+        {
+            string json = "{" + "{ '_ID' : "+ itemID + "}," + aNote + "}";
+            BsonDocument document = BsonDocument.Parse(json);
+            await collection.InsertOneAsync(document);
         }
 
         [Route("search")]
-		public IEnumerable<Item> GetSearch(string query = null)
-		{
-			return itemsClient.Search(query);
-		}
-	}
+        public IEnumerable<Item> GetSearch(string query = null)
+        {
+            IEnumerable<Item> items = itemsClient.Search(query);
+            foreach (var item in items)
+            {
+                item.setNote(collection);
+            }
+            return items;
+        }
+        
+    }
 }
 

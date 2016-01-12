@@ -27,7 +27,14 @@ namespace Ejercicio.Models
 		public ListingStatus Status { get; set; }
 		public string[] SubStatus { get; set; }
 		public DateTime StopTime { get; set; }
-}
+        public BsonDocument Note { get; set; }
+        public async void setNote(IMongoCollection<BsonDocument> collection)
+        {
+            var filter = Builders<BsonDocument>.Filter.Eq("_ID", Id);
+            var document = await collection.Find(filter).FirstOrDefaultAsync();
+            if (document != null) Note = document;
+        }
+    }
 
 	public enum ListingStatus { Active, Paused, Closed, UnderReview, Inactive, NotYetActive, PaymentRequired }
 	public enum ListingType { GoldSpecial, GoldPremium, Gold, Silver, Bronze, Free, GoldPro }
