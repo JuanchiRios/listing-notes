@@ -46,7 +46,7 @@ namespace Ejercicio.Tests.Services
         }
 
         [Fact]
-        public void It_shuold_send_a_request_to_site_search_api_sending_q_paramenter_when_search_is_called_without_any_query()
+        public void It_should_persist_the_note()
         { 
             this.itemController.PutNote("42", "esta publicación me interesa");
             Assert.Equal(this.expectedNote, repoNotes.getNote("42"));
