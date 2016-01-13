@@ -2,29 +2,28 @@
 using System.Web.Http;
 using Ejercicio.Models;
 using Ejercicio.Services;
-using MongoDB.Driver;
-using MongoDB.Bson;
+using Ejercicio.Repositories;
 
 namespace Ejercicio.Controllers
 {
 	[RoutePrefix("items")]
 	public class ItemsController : ApiController
     {
-        private static MongoClient client = new MongoClient();
-        private static IMongoDatabase database  = client.GetDatabase("itemsNotesDB");
-        public IMongoCollection<BsonDocument> collection { get; set; } = database.GetCollection<BsonDocument>("itemsNotesCollection");
 
         private readonly MercadolibreItemsClient itemsClient;
-	    public ItemsController(MercadolibreItemsClient itemsClient)
+        private readonly RepoNotes repoNotes;
+
+        public ItemsController(MercadolibreItemsClient itemsClient, RepoNotes repoNotes)
 	    {
 		    this.itemsClient = itemsClient;
-	    }
+            this.repoNotes = repoNotes;
+        }
 
         [Route("{id}")]
         public async System.Threading.Tasks.Task<Item> GetById(string id)
         {
             var item = itemsClient.GetById(id);
-            item.setNote(collection);
+            repoNotes.setNote(item);
             return item;
 
         }
@@ -32,9 +31,7 @@ namespace Ejercicio.Controllers
         [Route("{id}"), HttpPut]
         public async void PutNote(string itemID, string aNote)
         {
-            string json = "{" + "{ '_ID' : "+ itemID + "}," + aNote + "}";
-            BsonDocument document = BsonDocument.Parse(json);
-            await collection.InsertOneAsync(document);
+            repoNotes.saveNote(itemID,  aNote);
         }
 
         [Route("search")]
@@ -43,7 +40,7 @@ namespace Ejercicio.Controllers
             IEnumerable<Item> items = itemsClient.Search(query);
             foreach (var item in items)
             {
-                item.setNote(collection);
+                repoNotes.setNote(item);
             }
             return items;
         }

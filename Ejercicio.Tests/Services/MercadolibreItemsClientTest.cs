@@ -7,8 +7,6 @@ using FluentAssertions;
 using Moq;
 using RestSharp;
 using Xunit;
-using MongoDB.Bson;
-using MongoDB.Driver;
 
 namespace Ejercicio.Tests.Services
 {
