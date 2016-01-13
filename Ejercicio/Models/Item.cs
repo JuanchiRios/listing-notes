@@ -27,12 +27,8 @@ namespace Ejercicio.Models
 		public ListingStatus Status { get; set; }
 		public string[] SubStatus { get; set; }
 		public DateTime StopTime { get; set; }
-        public BsonDocument Note { get; set; }
-        public async void setNote(IMongoCollection<BsonDocument> collection)
-        {
-            var filter = Builders<BsonDocument>.Filter.Eq("_ID", Id);
-            Note = await collection.Find(filter).FirstOrDefaultAsync();//if it doesn't exist return null
-        }
+        public string Note { get; set; }
+
     }
 
 	public enum ListingStatus { Active, Paused, Closed, UnderReview, Inactive, NotYetActive, PaymentRequired }

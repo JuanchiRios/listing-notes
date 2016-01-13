@@ -44,7 +44,7 @@ namespace Ejercicio.Controllers
             }
             return items;
         }
-
+        /*
         [Route("search")]
         public IEnumerable<Item> GetSearchWithnotes(string query = null)
         {
@@ -56,7 +56,7 @@ namespace Ejercicio.Controllers
                 if (item.Note != null && item.Note.ContainsValue(query)) itemsWithNotes.Add(item);
             }
             return itemsWithNotes;
-        }
+        }*/
 
     }
 }

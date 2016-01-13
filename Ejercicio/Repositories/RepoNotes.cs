@@ -18,17 +18,28 @@ namespace Ejercicio.Repositories
             this.collection = collection;
         }
 
-        public async void setNote(Item item)
+        public  void setNote(Item item)
         {
-            var filter = Builders<BsonDocument>.Filter.Eq("_ID", item.Id);
-            item.Note = await collection.Find(filter).FirstOrDefaultAsync();//if it doesn't exist return null
-        }
-        public async void saveNote(string itemID, string aNote)
-        {
-            string json = "{" + "{ '_ID' : " + itemID + "}," + aNote + "}";
-            BsonDocument document = BsonDocument.Parse(json);
-            await collection.InsertOneAsync(document);
+            var filter = Builders<BsonDocument>.Filter.Eq("itemID", item.Id);
+            item.Note =  collection.Find(filter).FirstOrDefaultAsync().ToJson();//if it doesn't exist return null
         }
 
+        public string getNote(string itemId)
+        {
+            var filter = Builders<BsonDocument>.Filter.Eq("itemID", itemId);
+            var projection = Builders<BsonDocument>.Projection.Exclude("_id");
+            return collection.Find(filter).Project(projection).First().ToJson();//if it doesn't exist return null
+        }
+
+        public async void saveNote(string itemID, string aNote)
+        {
+            var document = new BsonDocument
+                                {
+                                    { "itemID", itemID },
+                                    { "notes", aNote }
+                                };
+            await collection.InsertOneAsync(document);
+        }
+        
     }
 }
