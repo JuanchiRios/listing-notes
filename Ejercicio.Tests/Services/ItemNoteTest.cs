@@ -53,5 +53,17 @@ namespace Ejercicio.Tests.Services
             Assert.Equal(1, collection.Count(new BsonDocument()));
         }
 
+        [Fact]
+        public void It_should_set_the_note_persisted_to_the_item()
+        {
+            var item42 = new Item();
+            item42.Id = "42";
+            Assert.Equal(null, item42.Note);
+            this.itemController.PutNote("42", "esta publicación me interesa");
+            this.repoNotes.setNote(item42);
+            Assert.Equal(this.expectedNote, item42.Note);
+            Assert.Equal(1, collection.Count(new BsonDocument()));
+        }
+
     }
 }

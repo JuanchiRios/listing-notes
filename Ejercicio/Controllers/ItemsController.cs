@@ -3,6 +3,7 @@ using System.Web.Http;
 using Ejercicio.Models;
 using Ejercicio.Services;
 using Ejercicio.Repositories;
+using MongoDB.Driver;
 
 namespace Ejercicio.Controllers
 {
@@ -20,7 +21,7 @@ namespace Ejercicio.Controllers
         }
 
         [Route("{id}")]
-        public async System.Threading.Tasks.Task<Item> GetById(string id)
+        public Item GetById(string id)
         {
             var item = itemsClient.GetById(id);
             repoNotes.setNote(item);
@@ -44,19 +45,21 @@ namespace Ejercicio.Controllers
             }
             return items;
         }
-        /*
+        
         [Route("search")]
         public IEnumerable<Item> GetSearchWithnotes(string query = null)
         {
             var itemsWithNotes = new List<Item>();
-            IEnumerable<Item> items = this.GetSearch();
-            foreach (var item in items)
+            var notes = repoNotes.getNotes(query);
+            Item item;
+            notes.ForEachAsync(note =>
             {
-                if (item.Note != null && query == null) itemsWithNotes.Add(item);
-                if (item.Note != null && item.Note.ContainsValue(query)) itemsWithNotes.Add(item);
-            }
+                item = GetById(note.GetValue("itemID").AsString);
+                itemsWithNotes.Add(item);
+             }
+             );
             return itemsWithNotes;
-        }*/
+        }
 
     }
 }

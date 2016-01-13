@@ -21,7 +21,8 @@ namespace Ejercicio.Repositories
         public  void setNote(Item item)
         {
             var filter = Builders<BsonDocument>.Filter.Eq("itemID", item.Id);
-            item.Note =  collection.Find(filter).FirstOrDefaultAsync().ToJson();//if it doesn't exist return null
+            var projection = Builders<BsonDocument>.Projection.Exclude("_id");
+            item.Note = collection.Find(filter).Project(projection).First().ToJson();//if it doesn't exist return null
         }
 
         public string getNote(string itemId)
@@ -31,15 +32,20 @@ namespace Ejercicio.Repositories
             return collection.Find(filter).Project(projection).First().ToJson();//if it doesn't exist return null
         }
 
-        public async void saveNote(string itemID, string aNote)
+        public void saveNote(string itemID, string aNote)
         {
             var document = new BsonDocument
                                 {
                                     { "itemID", itemID },
                                     { "notes", aNote }
                                 };
-            await collection.InsertOneAsync(document);
+             collection.InsertOneAsync(document);
         }
-        
+
+        public IFindFluent<BsonDocument, BsonDocument>  getNotes(string query)
+        {
+            var filter = Builders<BsonDocument>.Filter.Text(query);
+            return collection.Find(filter);
+        }
     }
 }
